@@ -95,7 +95,7 @@ body{background:linear-gradient(180deg,#fff 0%,#fff8f8 44%,#fff 100%);color:var(
     <div><div class="eyebrow"><span class="eyebrowdot"></span> Koperasi Desa/Kelurahan Merah Putih</div><h1>Belanja dekat,<br><em>lebih hemat!</em></h1><p>Selamat datang di <strong>KDKMP Sidoharjo</strong>. Temukan kebutuhan sehari-hari mu dengan cara yang praktis, nyaman, dan mudah.</p><div class="hero-promo" role="note" aria-label="Promo gratis ongkir wilayah Desa Sidoharjo"><span class="promo-icon" aria-hidden="true">🛵</span><span class="promo-copy"><span class="promo-kicker">Promo spesial warga</span><strong>GRATIS ONGKIR!</strong><small>Khusus wilayah Desa Sidoharjo</small></span><span class="promo-tag">HEMAT ✨</span></div><button class="primary" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">Mulai Belanja <span aria-hidden="true">↓</span></button></div>
     <div class="heroart" aria-hidden="true"><div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-bag">🛍️</div><span class="hero-spark spark-one">✦</span><span class="hero-spark spark-two">✧</span><div class="hero-stamp">KDKMP<br><b>SIDOHARJO</b></div></div>
   </section>
-  <div class="notice"><strong>Informasi:</strong> Pesanan belum otomatis dikonfirmasi. Admin akan memeriksa ketersediaan barang sebelum pesanan diproses.</div>
+  <!-- <div class="notice"><strong>Informasi:</strong> Pesanan belum otomatis dikonfirmasi. Admin akan memeriksa ketersediaan barang sebelum pesanan diproses.</div> -->
   <section id="catalog">
     <div class="sectionhead"><div><h2>Belanja kebutuhanmu</h2><p>Pilih produk yang kamu perlukan hari ini.</p></div><div class="statusline"><span class="dot" id="connectionDot"></span><span id="connectionText">Mode demo · data contoh</span></div></div>
     <div class="categories" id="categories"></div>
@@ -364,7 +364,7 @@ $("contactFloat").addEventListener("click",()=> $("contact").scrollIntoView({beh
 
 async function loadProducts(){if(!CONFIG.APPS_SCRIPT_URL){setConnection(false,"Mode demo · data contoh");if(!shouldDeferCatalogRender())render();return}try{const url=new URL(CONFIG.APPS_SCRIPT_URL);if(url.protocol!=="https:")throw new Error("URL API harus HTTPS");const res=await fetch(url.href+"?action=products",{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status);const data=await res.json();if(!Array.isArray(data.products))throw new Error("Format API tidak sesuai");products=data.products.map(normalise).filter(p=>p.sku&&p.name);setConnection(true,"Terhubung");if(!shouldDeferCatalogRender())render();return true}catch(err){console.error(err);setConnection(false,"Koneksi gagal · data demo");if(!shouldDeferCatalogRender())$("productGrid").innerHTML='<div class="empty">Data produk dari server gagal dimuat. Periksa koneksi atau konfigurasi API, lalu coba muat ulang.</div>';toast("Gagal memuat produk dari Google Spreadsheet.");return false}}
 
-function readEntry(){fromWhatsApp=true;$("entryWarning").textContent="Isi data pelanggan secara manual. Checkout tidak memerlukan tautan khusus dari WhatsApp.";$("checkoutButton").disabled=Object.values(cart).every(item=>!item||item.qty<=0);}
+function readEntry(){fromWhatsApp=true;$("entryWarning").textContent="Anda akan diteruskan ke WhatsApp untuk mengirimkan rincian pesanan. GRATIS ONGKIR DESA SIDOHARJO";$("checkoutButton").disabled=Object.values(cart).every(item=>!item||item.qty<=0);}
 
 
 async function useCurrentLocation(){
