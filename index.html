@@ -364,7 +364,7 @@ $("contactFloat").addEventListener("click",()=> $("contact").scrollIntoView({beh
 
 async function loadProducts(){if(!CONFIG.APPS_SCRIPT_URL){setConnection(false,"Mode demo · data contoh");if(!shouldDeferCatalogRender())render();return}try{const url=new URL(CONFIG.APPS_SCRIPT_URL);if(url.protocol!=="https:")throw new Error("URL API harus HTTPS");const res=await fetch(url.href+"?action=products",{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status);const data=await res.json();if(!Array.isArray(data.products))throw new Error("Format API tidak sesuai");products=data.products.map(normalise).filter(p=>p.sku&&p.name);setConnection(true,"Terhubung");if(!shouldDeferCatalogRender())render();return true}catch(err){console.error(err);setConnection(false,"Koneksi gagal · data demo");if(!shouldDeferCatalogRender())$("productGrid").innerHTML='<div class="empty">Data produk dari server gagal dimuat. Periksa koneksi atau konfigurasi API, lalu coba muat ulang.</div>';toast("Gagal memuat produk dari Google Spreadsheet.");return false}}
 
-function readEntry(){fromWhatsApp=true;$("entryWarning").textContent="Anda akan diteruskan ke WhatsApp untuk mengirimkan rincian pesanan. GRATIS ONGKIR DESA SIDOHARJO";$("checkoutButton").disabled=Object.values(cart).every(item=>!item||item.qty<=0);}
+function readEntry(){fromWhatsApp=true;$("entryWarning").textContent="Selesaikan pesananmu sekarang! Kamu akan otomatis diarahkan ke WhatsApp beserta rincian belanjamu. GRATIS ONGKIR khusus wilayah Desa Sidoharjo!";$("checkoutButton").disabled=Object.values(cart).every(item=>!item||item.qty<=0);}
 
 
 async function useCurrentLocation(){
