@@ -189,7 +189,7 @@ body{background:linear-gradient(180deg,#fff 0%,#fff8f8 44%,#fff 100%);color:var(
 
 const CONFIG={
 
- APPS_SCRIPT_URL:"https://script.google.com/macros/s/AKfycbwKc6C059cX16Q8aM8akI6BV5NCSrQ6XIsWJxXNtq_NL2-wOnZYqYs1OkKAyG2rS0w/exec", // Pastikan ini URL /exec deployment terbaru.
+ APPS_SCRIPT_URL:"https://script.google.com/macros/s/AKfycbzf6Zj6So01SvwQq9RwaJr8wFCxDax5bDwdElejrpaIOvoigwumeWr2xtI7kKfqYbo/exec", // Pastikan ini URL /exec deployment terbaru.
  TURNSTILE_SITE_KEY:"0x4AAAAAAFXlmV_KtSq6VqB9", // Site key publik dari Cloudflare Turnstile.
 
  ADMIN_WHATSAPP:"6282338804175", // GANTI dengan nomor WhatsApp resmi KDKMP, format 62...
@@ -467,15 +467,35 @@ function jsonpSubsidy(params,timeout=12000){
 function postSubsidyRequest(payload,timeout=15000){
  return new Promise((resolve,reject)=>{
   if(!CONFIG.APPS_SCRIPT_URL)return reject(new Error('URL Apps Script belum diatur.'));
-  const nonce='kdkmp_'+Date.now()+'_'+Math.random().toString(36).slice(2,12);
+  // Nonce acak kriptografis untuk mengikat balasan ke permintaan ini.
+  if(!window.crypto||typeof window.crypto.getRandomValues!=='function')return reject(new Error('Browser tidak mendukung pengamanan permintaan. Perbarui browser lalu coba lagi.'));
+  const nonceBytes=new Uint8Array(24);window.crypto.getRandomValues(nonceBytes);
+  const nonce='kdkmp_'+Array.from(nonceBytes,b=>b.toString(16).padStart(2,'0')).join('');
   const frame=document.createElement('iframe');frame.name='kdkmp_frame_'+nonce;frame.style.display='none';frame.setAttribute('aria-hidden','true');
   const form=document.createElement('form');form.method='POST';form.action=CONFIG.APPS_SCRIPT_URL;form.target=frame.name;form.style.display='none';
   const field=document.createElement('input');field.type='hidden';field.name='payload';field.value=JSON.stringify({...payload,transport:'iframe',nonce});form.appendChild(field);
   let timer;
   const cleanup=()=>{clearTimeout(timer);window.removeEventListener('message',onMessage);form.remove();frame.remove()};
   const onMessage=(event)=>{
+   // Hanya terima balasan dari iframe khusus permintaan ini, bukan window lain.
+   if(event.source!==frame.contentWindow)return;
+   // Apps Script dapat mengalihkan iframe ke script.googleusercontent.com.
+   // Tolak origin non-HTTPS dan origin yang bukan domain resmi Google untuk bridge ini.
+   let trustedOrigin=false;
+   try{
+    const originUrl=new URL(event.origin);
+    const host=originUrl.hostname.toLowerCase();
+    trustedOrigin=originUrl.protocol==='https:' && (
+     host==='script.google.com' ||
+     host==='script.googleusercontent.com' ||
+     host.endsWith('.script.googleusercontent.com') ||
+     host==='googleusercontent.com' ||
+     host.endsWith('.googleusercontent.com')
+    );
+   }catch(_){trustedOrigin=false;}
+   if(!trustedOrigin)return;
    const data=event.data;
-   if(!data||data.type!=='KDKMP_API_RESULT'||data.nonce!==nonce)return;
+   if(!data||data.type!=='KDKMP_API_RESULT'||data.nonce!==nonce||!data.result||typeof data.result!=='object')return;
    cleanup();resolve(data.result);
   };
   window.addEventListener('message',onMessage);
